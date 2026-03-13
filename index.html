@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Property Survey — Triumph Asset Advisors</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1621;
+  --surf: #1b2838;
+  --surf2: #243447;
+  --surf3: #2d3f55;
+  --accent: #e8963a;
+  --accent2: #f5c26b;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --blue: #3498db;
+  --text: #e8eaf0;
+  --muted: #8899aa;
+  --dim: #445566;
+  --border: #2d3f55;
+  --r: 10px;
+  --r-sm: 6px;
+  --wa: #25d366;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--surf);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 100;
+}
+.hdr-logo {
+  width: 34px; height: 34px; background: var(--accent);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 15px; color: #fff; flex-shrink: 0;
+}
+.hdr-title { font-size: 14px; font-weight: 700; }
+.hdr-sub { font-size: 10px; color: var(--muted); }
+.sync-dot {
+  margin-left: auto; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--dim); flex-shrink: 0;
+  transition: background 0.3s;
+}
+.sync-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.sync-dot.syncing { background: var(--accent); animation: pulse 1s infinite; }
+.sync-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.sync-label { font-size: 10px; color: var(--muted); margin-right: 4px; }
+
+/* ── MODE TOGGLE ── */
+.mode-bar {
+  display: flex; background: var(--surf);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 59px; z-index: 99;
+}
+.mode-btn {
+  flex: 1; padding: 10px;
+  font-size: 12px; font-weight: 600;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  text-align: center; transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.mode-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── PROGRESS ── */
+.prog-bar { height: 2px; background: var(--border); position: sticky; top: 144px; z-index: 98; }
+.prog-fill { height: 100%; background: linear-gradient(90deg,var(--accent),var(--accent2)); transition: width .3s; }
+
+/* ── SECTION TABS ── */
+.sec-tabs {
+  display: flex; overflow-x: auto; scrollbar-width: none;
+  background: var(--surf); border-bottom: 1px solid var(--border);
+  position: sticky; top: 146px; z-index: 97;
+}
+.sec-tabs::-webkit-scrollbar { display: none; }
+.s-tab {
+  padding: 9px 14px; font-size: 10px; font-weight: 700;
+  color: var(--dim); white-space: nowrap; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.2s;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.s-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── CONTENT ── */
+.main { padding: 0 14px 100px; max-width: 680px; margin: 0 auto; }
+.section { display: none; padding-top: 16px; }
+.section.active { display: block; }
+
+/* ── SECTION HEADER ── */
+.sec-hdr {
+  padding: 12px 14px; border-radius: var(--r) var(--r) 0 0; margin-bottom: 2px;
+}
+.sec-hdr-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+.sec-hdr-sub { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px; margin-bottom: 10px;
+}
+
+/* ── FIELD ── */
+.field { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.lbl {
+  display: block; font-size: 10px; font-weight: 700;
+  color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px;
+}
+.req { color: var(--accent); margin-left: 2px; }
+
+input, select, textarea {
+  width: 100%; background: var(--surf2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 12px;
+  transition: border-color .2s, box-shadow .2s; -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(232,150,58,.1);
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238899aa'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+textarea { resize: vertical; min-height: 72px; }
+::placeholder { color: var(--dim); }
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* ── GPS ROW ── */
+.gps-row { display: flex; gap: 8px; align-items: flex-end; }
+.gps-row .field { flex: 1; margin-bottom: 0; }
+.btn-gps {
+  background: var(--surf3); border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--green); font-size: 11px; font-weight: 700; padding: 10px 11px;
+  cursor: pointer; white-space: nowrap; height: 40px;
+  display: flex; align-items: center; gap: 5px; transition: all .2s;
+}
+.btn-gps:hover { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-gps.loading { opacity: .6; pointer-events: none; }
+
+/* ── PROP ID ── */
+.prop-id {
+  font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500;
+  color: var(--accent); background: var(--surf2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 9px 13px; letter-spacing: 2px;
+}
+
+/* ── CHECKLIST ── */
+.chk-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px; background: var(--surf2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); margin-bottom: 7px; cursor: pointer; transition: all .2s;
+  user-select: none; -webkit-user-select: none;
+}
+.chk-item.on { background: rgba(46,204,113,.08); border-color: var(--green); }
+.chk-box {
+  width: 22px; height: 22px; border: 2px solid var(--dim); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .2s; font-size: 13px;
+}
+.chk-item.on .chk-box { background: var(--green); border-color: var(--green); color: #fff; }
+.chk-info { flex: 1; }
+.chk-name { font-size: 12px; font-weight: 600; }
+.chk-hint { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.chk-tag {
+  font-family: 'DM Mono'; font-size: 9px; padding: 3px 7px;
+  border-radius: 20px; background: var(--surf3); color: var(--muted);
+}
+
+/* ── SCORE ── */
+.score-wrap {
+  background: var(--surf2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px; margin-top: 4px;
+}
+.score-num {
+  font-family: 'DM Mono'; font-size: 32px; font-weight: 500; min-width: 60px; text-align: center;
+}
+.score-pass { color: var(--green); }
+.score-fail { color: var(--red); }
+.score-info { flex: 1; }
+.score-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 6px 0; }
+.score-bar { height: 100%; border-radius: 3px; transition: width .4s, background .4s; }
+.score-verdict {
+  font-size: 11px; font-weight: 700; padding: 5px 10px;
+  border-radius: 20px; display: inline-block;
+}
+.verd-pass { background: rgba(46,204,113,.12); color: var(--green); }
+.verd-fail { background: rgba(231,76,60,.12); color: var(--red); }
+
+/* ── NAV ── */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surf); border-top: 1px solid var(--border);
+  padding: 10px 14px; display: flex; gap: 10px; z-index: 200;
+  max-width: 680px; margin: 0 auto;
+}
+/* Center the fixed nav */
+.nav-bar { left: 50%; transform: translateX(-50%); width: 100%; max-width: 680px; }
+@media (max-width: 680px) { .nav-bar { left: 0; transform: none; max-width: 100%; } }
+
+.btn {
+  flex: 1; padding: 13px; border-radius: var(--r-sm);
+  font-family: 'DM Sans'; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: none; transition: all .2s;
+}
+.btn-back { background: var(--surf2); color: var(--muted); border: 1px solid var(--border); }
+.btn-next { background: var(--accent); color: #fff; }
+.btn-next:hover { background: #d4832a; }
+.btn-save { background: var(--green); color: #fff; }
+.btn-save:hover { background: #27ae60; }
+
+/* ── SAVE SHEET ── */
+.save-sheet {
+  display: none; padding: 16px; background: var(--surf2);
+  border: 1px solid var(--border); border-radius: var(--r); margin-top: 10px;
+}
+.save-sheet.open { display: block; }
+.save-row { display: flex; gap: 8px; align-items: flex-end; }
+.url-input {
+  flex: 1; background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r-sm); color: var(--text); font-size: 12px;
+  font-family: 'DM Mono'; padding: 10px 12px;
+}
+.url-input:focus { outline: none; border-color: var(--accent); }
+.btn-connect {
+  padding: 10px 14px; background: var(--blue); color: #fff;
+  border: none; border-radius: var(--r-sm); font-size: 12px;
+  font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+
+/* ── EXPORT OPTIONS ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.6); z-index: 300; align-items: flex-end; justify-content: center;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--surf); border-radius: var(--r) var(--r) 0 0;
+  border: 1px solid var(--border); border-bottom: none;
+  padding: 20px 16px; width: 100%; max-width: 680px;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+.exp-opt {
+  background: var(--surf2); border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 13px 14px; margin-bottom: 8px; cursor: pointer;
+  display: flex; align-items: center; gap: 12px; transition: all .2s;
+}
+.exp-opt:hover { border-color: var(--accent); }
+.exp-ico {
+  width: 38px; height: 38px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.exp-lbl { font-size: 13px; font-weight: 600; }
+.exp-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ── STATUS BANNER ── */
+.status-banner {
+  display: none; position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  padding: 9px 18px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  z-index: 400; white-space: nowrap;
+}
+.status-banner.show { display: block; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+.banner-ok { background: var(--green); color: #fff; }
+.banner-err { background: var(--red); color: #fff; }
+.banner-info { background: var(--blue); color: #fff; }
+
+/* ── QUICK CAPTURE ── */
+.qc-tip {
+  background: rgba(232,150,58,.06); border: 1px solid rgba(232,150,58,.2);
+  border-radius: var(--r); padding: 12px 14px; margin-bottom: 12px;
+  font-size: 11px; color: var(--muted); line-height: 1.6;
+}
+.qc-tip strong { color: var(--accent); }
+
+/* ── SETTINGS SHEET ── */
+.settings-icon {
+  margin-left: auto; width: 30px; height: 30px;
+  background: var(--surf2); border-radius: 6px; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px;
+}
+
+hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.hint { font-size: 10px; color: var(--dim); margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">T</div>
+  <div>
+    <div class="hdr-title">Property Survey</div>
+    <div class="hdr-sub">Triumph Asset Advisors · Hyderabad</div>
+  </div>
+  <span class="sync-label" id="syncLabel">Not connected</span>
+  <div class="sync-dot" id="syncDot"></div>
+  <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+</div>
+
+<!-- SETTINGS PANEL (hidden by default) -->
+<div id="settingsPanel" style="display:none; background:var(--surf2); border-bottom:1px solid var(--border); padding:14px;">
+  <div class="lbl">Google Sheets Webhook URL</div>
+  <div class="save-row">
+    <input type="url" class="url-input" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn-connect" onclick="connectSheet()">Test & Save</button>
+  </div>
+  <div class="hint" style="margin-top:6px">Paste the Apps Script Web App URL here. See setup instructions in google-apps-script.js</div>
+</div>
+
+
+<!-- SURVEYOR BAR -->
+<div class="surveyor-bar" id="surveyorBar">
+  <div class="surveyor-avatar" id="surveyorAvatar">👤</div>
+  <div id="surveyorInfo">
+    <div class="surveyor-name" id="surveyorNameDisplay">Not signed in</div>
+    <div class="surveyor-email" id="surveyorEmailDisplay">Sign in to record surveyor details</div>
+  </div>
+  <div id="signInBtnWrap" style="margin-left:auto">
+    <div id="g_id_onload"
+      data-client_id="YOUR_GOOGLE_CLIENT_ID"
+      data-callback="onGoogleSignIn"
+      data-auto_select="true"
+      data-itp_support="true">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="small"
+      data-theme="outline"
+      data-text="sign_in_with"
+      data-shape="rectangular"
+      data-logo_alignment="left">
+    </div>
+  </div>
+  <span class="surveyor-required" id="surveyorRequired" style="display:none">⚠️ Required</span>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+<!-- MODE TOGGLE -->
+<div class="mode-bar">
+  <div class="mode-btn active" id="modeQuick" onclick="setMode('quick')">⚡ QUICK CAPTURE</div>
+  <div class="mode-btn" id="modeFull" onclick="setMode('full')">📋 FULL ENTRY</div>
+</div>
+
+<!-- SECTION TABS (full mode only) -->
+<div class="sec-tabs" id="secTabs">
+  <div class="s-tab active" onclick="goSec(0)">① Location</div>
+  <div class="s-tab" onclick="goSec(1)">② Area</div>
+  <div class="s-tab" onclick="goSec(2)">③ On-Field</div>
+  <div class="s-tab" onclick="goSec(3)">④ Building</div>
+  <div class="s-tab" onclick="goSec(4)">⑤ Commercial</div>
+  <div class="s-tab" onclick="goSec(5)">⑥ Owner</div>
+  <div class="s-tab" onclick="goSec(6)">⑦ Status</div>
+</div>
+
+<div class="main" id="mainArea">
+
+<!-- ===== QUICK CAPTURE MODE ===== -->
+<div id="quickMode">
+  <div class="qc-tip" style="margin-top:16px">
+    <strong>Quick Capture</strong> — for on-field use. Fill the 6 essentials while standing at the property. Complete the rest back at the office using Full Entry mode.
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">Owner Name <span class="req">*</span></label>
+      <input type="text" id="q_ownerName" placeholder="Name from To-Let board or call">
+    </div>
+    <div class="field">
+      <label class="lbl">Owner Contact Number <span class="req">*</span></label>
+      <input type="tel" id="q_ownerPhone" placeholder="10-digit mobile number" maxlength="10">
+    </div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">Zone + Market <span class="req">*</span></label>
+      <div class="g2" style="gap:8px">
+        <select id="q_zone" onchange="updateMarkets('q_market', this.value)">
+          <option value="">Zone</option>
+          <option>West Zone</option><option>Central Zone</option>
+          <option>North Zone</option><option>East Zone</option><option>South Zone</option>
+        </select>
+        <select id="q_market"><option value="">Market</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Key Road / Location <span class="req">*</span></label>
+      <input type="text" id="q_road" placeholder="e.g. Road No. 12, Banjara Hills">
+    </div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">Rental Ask (₹/SFT/Month)</label>
+      <input type="number" id="q_rent" placeholder="e.g. 85">
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Carpet Area (SFT)</label>
+        <input type="number" id="q_carpet" placeholder="e.g. 3200">
+      </div>
+      <div class="field">
+        <label class="lbl">Security Deposit</label>
+        <select id="q_deposit">
+          <option value="">Select</option>
+          <option>3 Months</option><option>6 Months</option>
+          <option>9 Months</option><option>12 Months</option><option>Negotiable</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">GPS Location (auto-fills on load)</label>
+      <div class="gps-row">
+        <div class="field">
+          <input type="text" id="q_lat" placeholder="Latitude" readonly>
+        </div>
+        <div class="field">
+          <input type="text" id="q_lng" placeholder="Longitude" readonly>
+        </div>
+        <button class="btn-gps" id="gpsBtnQ" onclick="getGPS('q_lat','q_lng','gpsBtnQ')">📍 GPS</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Quick Notes</label>
+      <textarea id="q_notes" placeholder="Floor config, parking, building condition, any constraints..." style="min-height:60px"></textarea>
+    </div>
+  </div>
+
+  <button class="btn btn-save" style="width:100%;margin-top:4px;padding:14px;border-radius:var(--r-sm);font-size:14px;cursor:pointer;" onclick="saveQuick()">
+    💾 Save to Google Sheets + Download Backup
+  </button>
+</div>
+
+<!-- ===== FULL ENTRY MODE ===== -->
+<div id="fullMode" style="display:none">
+
+<!-- SEC 0: LOCATION -->
+<div class="section active" id="s0">
+  <div class="sec-hdr" style="background:#1b3a5c">
+    <div class="sec-hdr-title">Property Identity</div>
+    <div class="sec-hdr-sub">Where is the property?</div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">Property ID</label>
+      <div class="prop-id" id="propId">TAA-2026-0001</div>
+    </div>
+    <hr>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Zone <span class="req">*</span></label>
+        <select id="f_zone" onchange="updateMarkets('f_market', this.value)">
+          <option value="">Select Zone</option>
+          <option>West Zone</option><option>Central Zone</option>
+          <option>North Zone</option><option>East Zone</option><option>South Zone</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Market / Area <span class="req">*</span></label>
+        <select id="f_market"><option value="">Select Market</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Key Road / Location <span class="req">*</span></label>
+      <input type="text" id="f_road" placeholder="e.g. Road No. 12, Banjara Hills">
+    </div>
+    <div class="field">
+      <label class="lbl">Full Address</label>
+      <textarea id="f_address" placeholder="Plot No., Building Name, Road, Landmark..." style="min-height:64px"></textarea>
+    </div>
+    <div class="field">
+      <label class="lbl">Developer / Builder Name</label>
+      <input type="text" id="f_developer" placeholder="Name if known">
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">PIN Code</label>
+        <input type="text" id="f_pin" placeholder="500034" maxlength="6">
+      </div>
+      <div class="field">
+        <label class="lbl">Google Maps Link</label>
+        <input type="url" id="f_maps" placeholder="Paste URL">
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">GPS Coordinates</label>
+      <div class="gps-row">
+        <div class="field"><input type="text" id="f_lat" placeholder="Latitude" readonly></div>
+        <div class="field"><input type="text" id="f_lng" placeholder="Longitude" readonly></div>
+        <button class="btn-gps" id="gpsBtnF" onclick="getGPS('f_lat','f_lng','gpsBtnF')">📍 GPS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEC 1: AREA -->
+<div class="section" id="s1">
+  <div class="sec-hdr" style="background:#1b3a2a">
+    <div class="sec-hdr-title">Area Details</div><div class="sec-hdr-sub">How big is it?</div>
+  </div>
+  <div class="card">
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Total SBU Area (SFT)</label>
+        <input type="number" id="f_sbu" placeholder="e.g. 4500">
+      </div>
+      <div class="field">
+        <label class="lbl">Carpet Area (SFT)</label>
+        <input type="number" id="f_carpet" placeholder="e.g. 3800">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Property Age / Year Built</label>
+        <input type="text" id="f_age" placeholder="e.g. 2018">
+      </div>
+      <div class="field">
+        <label class="lbl">No. of Floors (Total)</label>
+        <input type="number" id="f_floors" placeholder="e.g. 4">
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Available Floors</label>
+      <select id="f_availFloors">
+        <option value="">Select</option>
+        <option>Full Building</option><option>G</option><option>G+1</option>
+        <option>G+2</option><option>G+3</option><option>1+2</option><option>1+3</option>
+        <option>1+2+3+4</option><option>2+3</option><option>2+3+4</option><option>3+4</option>
+        <option>Either of Above Floors</option><option>Top Floor</option><option>Terrace</option>
+        <option>Basement + G</option><option>Any Floor</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="lbl">Property Type</label>
+      <select id="f_propType">
+        <option value="">Select</option>
+        <option>Ready to Move In</option><option>Bare Shell</option><option>Warm Shell</option>
+        <option>Build-to-Suit (BTS)</option><option>Land Lease</option><option>Under Construction</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- SEC 2: ON-FIELD -->
+<div class="section" id="s2">
+  <div class="sec-hdr" style="background:#3a2a1b">
+    <div class="sec-hdr-title">On-Field Qualification</div>
+    <div class="sec-hdr-sub">Tap to mark each criterion · 70% minimum to proceed</div>
+  </div>
+  <div class="card" id="chkList"></div>
+  <div class="score-wrap">
+    <div>
+      <div class="score-num score-fail" id="scoreNum">0/10</div>
+      <div style="font-size:10px;color:var(--muted);text-align:center">criteria met</div>
+    </div>
+    <div class="score-info">
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:10px;color:var(--muted)">Qualification Score</span>
+        <span style="font-size:10px;font-family:'DM Mono';color:var(--muted)" id="scorePct">0%</span>
+      </div>
+      <div class="score-track"><div class="score-bar" id="scoreBar" style="width:0%;background:var(--red)"></div></div>
+      <div><span class="score-verdict verd-fail" id="scoreVerdict">❌ Below threshold</span></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Road Width (Ft)</label>
+        <input type="number" id="f_roadW" placeholder="e.g. 80">
+      </div>
+      <div class="field">
+        <label class="lbl">Building Width (Ft)</label>
+        <input type="number" id="f_bldgW" placeholder="e.g. 40">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Facade Frontage (Ft)</label>
+        <input type="number" id="f_facade" placeholder="e.g. 35">
+      </div>
+      <div class="field">
+        <label class="lbl">Slab-to-Slab Height (Ft)</label>
+        <input type="number" id="f_slab" placeholder="e.g. 12">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEC 3: BUILDING -->
+<div class="section" id="s3">
+  <div class="sec-hdr" style="background:#2a1b3a">
+    <div class="sec-hdr-title">Building Features</div><div class="sec-hdr-sub">Building specs & compliance</div>
+  </div>
+  <div class="card">
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Column Spacing</label>
+        <select id="f_cols">
+          <option value="">Select</option>
+          <option>No Columns (Open Plan)</option><option>Limited Columns</option>
+          <option>Regular Columns</option><option>Heavy Columns</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Storefront Parking</label>
+        <select id="f_park">
+          <option value="">Select</option>
+          <option>Ample (10+ cars)</option><option>Moderate (5-10 cars)</option>
+          <option>Limited (2-5 cars)</option><option>No Parking</option><option>Shared Parking</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Basement / Cellar</label>
+        <select id="f_base">
+          <option value="">Select</option>
+          <option>Yes — Dedicated</option><option>Yes — Shared</option>
+          <option>No Basement</option><option>Under Construction</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Elevator / Lift</label>
+        <select id="f_lift">
+          <option value="">Select</option>
+          <option>Yes — Passenger</option><option>Yes — Goods + Passenger</option>
+          <option>Yes — Goods Only</option><option>No Elevator</option><option>Under Installation</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Access Type</label>
+        <select id="f_access">
+          <option value="">Select</option>
+          <option>Front Road Access</option><option>Side Access</option>
+          <option>Rear Access</option><option>Multiple Access Points</option><option>Service Road Access</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Power Load (KVA)</label>
+        <input type="number" id="f_power" placeholder="e.g. 150">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Power Backup</label>
+        <select id="f_backup">
+          <option value="">Select</option>
+          <option>100% DG Backup</option><option>Partial DG Backup</option>
+          <option>No Backup</option><option>Provision Available</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Glass Glazing</label>
+        <select id="f_glass">
+          <option value="">Select</option>
+          <option>Full Glass Facade</option><option>Partial Glass</option>
+          <option>No Glass</option><option>Under Fitout</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Internal Staircase</label>
+        <select id="f_stairs"><option value="">Select</option><option>Yes</option><option>No</option><option>Can Be Built</option></select>
+      </div>
+      <div class="field">
+        <label class="lbl">Flooring</label>
+        <select id="f_floor">
+          <option value="">Select</option>
+          <option>Vitrified Tiles</option><option>Marble</option><option>Granite</option>
+          <option>Wooden / Laminate</option><option>Epoxy / Industrial</option>
+          <option>Bare / RCC</option><option>Under Fitout</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Compliance Status</label>
+        <select id="f_comply">
+          <option value="">Select</option>
+          <option>Fully Compliant</option><option>Partially Compliant</option>
+          <option>Pending Approvals</option><option>Not Verified</option><option>Non-Compliant</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">CAD / Floor Plan</label>
+        <select id="f_cad"><option value="">Select</option><option>Yes</option><option>No</option><option>Pending</option></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEC 4: COMMERCIAL -->
+<div class="section" id="s4">
+  <div class="sec-hdr" style="background:#3a1b2a">
+    <div class="sec-hdr-title">Commercial Terms</div><div class="sec-hdr-sub">What are the terms?</div>
+  </div>
+  <div class="card">
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Rent (₹/SFT/Month)</label>
+        <input type="number" id="f_rent" placeholder="e.g. 85">
+      </div>
+      <div class="field">
+        <label class="lbl">Maintenance (₹/SFT)</label>
+        <input type="number" id="f_maint" placeholder="e.g. 8">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Security Deposit</label>
+        <select id="f_deposit">
+          <option value="">Select</option>
+          <option>3 Months</option><option>6 Months</option><option>9 Months</option>
+          <option>12 Months</option><option>Negotiable</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Lock-In Period</label>
+        <select id="f_lockin">
+          <option value="">Select</option>
+          <option>1 Year</option><option>2 Years</option><option>3 Years</option>
+          <option>5 Years</option><option>Negotiable</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Lease Term (Years)</label>
+      <input type="number" id="f_lease" placeholder="e.g. 5">
+    </div>
+  </div>
+</div>
+
+<!-- SEC 5: OWNER -->
+<div class="section" id="s5">
+  <div class="sec-hdr" style="background:#1b2838">
+    <div class="sec-hdr-title">Owner Details</div><div class="sec-hdr-sub">Who owns it?</div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">Owner / Landlord Name <span class="req">*</span></label>
+      <input type="text" id="f_ownerName" placeholder="Full name">
+    </div>
+    <div class="field">
+      <label class="lbl">Owner Contact Number <span class="req">*</span></label>
+      <input type="tel" id="f_ownerPhone" placeholder="10-digit mobile">
+    </div>
+    <div class="field">
+      <label class="lbl">Owner Constraints / Notes</label>
+      <textarea id="f_ownerNotes" placeholder="e.g. No restaurant, only retail / Needs 3 month notice..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SEC 6: STATUS -->
+<div class="section" id="s6">
+  <div class="sec-hdr" style="background:#0d3b2a">
+    <div class="sec-hdr-title">Status & Tracking</div><div class="sec-hdr-sub">Pipeline tracking</div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label class="lbl">Property Status</label>
+      <select id="f_status">
+        <option value="">Select</option>
+        <option>Available</option><option>Under Negotiation</option>
+        <option>Site Visit Scheduled</option><option>LOI Submitted</option>
+        <option>Agreement Signed</option><option>Closed / Leased Out</option>
+        <option>On Hold</option><option>Rejected</option>
+      </select>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="lbl">Sourced Date</label>
+        <input type="date" id="f_sourcedDate">
+      </div>
+      <div class="field">
+        <label class="lbl">Last Follow-Up Date</label>
+        <input type="date" id="f_followup">
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Matched To Brand</label>
+      <input type="text" id="f_brand" placeholder="Brand being pitched this property">
+    </div>
+    <div class="field">
+      <label class="lbl">Preferred Brand Category</label>
+      <input type="text" id="f_brandCat" placeholder="e.g. QSR, Pharmacy, Gym, Apparel...">
+    </div>
+    <div class="field">
+      <label class="lbl">Photos / Video Link</label>
+      <input type="url" id="f_photos" placeholder="Google Drive link">
+    </div>
+    <div class="field">
+      <label class="lbl">Notes / Remarks</label>
+      <textarea id="f_notes" placeholder="Observations, follow-up actions..."></textarea>
+    </div>
+  </div>
+</div>
+
+</div><!-- end fullMode -->
+</div><!-- end main -->
+
+<!-- NAV BAR -->
+<div class="nav-bar" id="navBar">
+  <button class="btn btn-back" id="btnBack" onclick="navigate(-1)" disabled>← Back</button>
+  <button class="btn btn-next" id="btnNext" onclick="navigate(1)">Next →</button>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="exportModal">
+  <div class="modal">
+    <div class="modal-title">💾 Save Property</div>
+    <div class="modal-sub">Entry will be saved to Google Sheets. Choose a backup option too.</div>
+    <div id="sheetStatus" style="margin-bottom:12px;font-size:12px;color:var(--muted)">Checking Google Sheets connection...</div>
+    <div class="exp-opt" onclick="saveToSheets()">
+      <div class="exp-ico" style="background:rgba(52,168,83,.15)">📊</div>
+      <div><div class="exp-lbl">Save to Google Sheets</div><div class="exp-desc">Appends new row to your System 2 cloud sheet</div></div>
+    </div>
+    <div class="exp-opt" onclick="copyRow()">
+      <div class="exp-ico" style="background:rgba(232,150,58,.15)">📋</div>
+      <div><div class="exp-lbl">Copy Row (paste to Excel)</div><div class="exp-desc">Tab-separated, paste directly into System 2 .xlsx</div></div>
+    </div>
+    <div class="exp-opt" onclick="downloadCSV()">
+      <div class="exp-ico" style="background:rgba(46,204,113,.15)">⬇️</div>
+      <div><div class="exp-lbl">Download CSV Backup</div><div class="exp-desc">Save as .csv on this device</div></div>
+    </div>
+    <div class="exp-opt" onclick="closeModal()" style="opacity:.55">
+      <div class="exp-ico" style="background:rgba(255,255,255,.05)">✕</div>
+      <div><div class="exp-lbl">Cancel</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER -->
+<div class="status-banner" id="banner"></div>
+
+<script>
+const MARKETS = {
+  'West Zone':    ['Madhapur','Kondapur','Gachibowli','Kukatpally / KPHB','Miyapur','Manikonda'],
+  'Central Zone': ['Banjara Hills','Jubilee Hills','Panjagutta / Somajiguda','Himayathnagar'],
+  'North Zone':   ['Secunderabad','Begumpet','Alwal','Kompally','Malkajgiri'],
+  'East Zone':    ['Uppal','LB Nagar','Dilsukhnagar','Kothapet','Tarnaka','AS Rao Nagar'],
+  'South Zone':   ['Charminar','Mehdipatnam','Attapur','Rajendra Nagar','Shamshabad']
+};
+const CHECKLIST = [
+  { id:'rd',  name:'Road Width',          hint:'60 feet and above',            tag:'≥60 ft' },
+  { id:'bw',  name:'Building Width',      hint:'Minimum 25 feet frontage',     tag:'≥25 ft' },
+  { id:'co',  name:'Column Spacing',      hint:'Limited or no columns',        tag:'Open plan' },
+  { id:'sp',  name:'Storefront Parking',  hint:'Ample parking in front',       tag:'10+ cars' },
+  { id:'bp',  name:'Basement Parking',    hint:'Cellar or basement parking',   tag:'Basement' },
+  { id:'sh',  name:'Slab Height',         hint:'9 feet or above per floor',    tag:'≥9 ft' },
+  { id:'ac',  name:'Road Access',         hint:'Front access from road side',  tag:'Road-facing' },
+  { id:'lf',  name:'Elevator / Lift',     hint:'Lift present',                 tag:'Lift' },
+  { id:'cm',  name:'Compliance',          hint:'Municipal compliance met',     tag:'OC/CC' },
+  { id:'sg',  name:'To-Let Signage',      hint:'Yellow board with contact',    tag:'Board' },
+];
+
+let checks = {}, curSec = 0, curMode = 'quick';
+const TOTAL_SECS = 7;
+
+// ── INIT ──
+window.onload = () => {
+  loadSettings();
+  loadSurveyor();
+  buildChecklist();
+  setToday();
+  generatePropId();
+  autoGPS();
+  // Hide nav for quick mode
+  updateNav();
+};
+
+function setToday() {
+  const today = new Date().toISOString().split('T')[0];
+  ['f_sourcedDate','f_followup'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+}
+
+function generatePropId() {
+  const props = JSON.parse(localStorage.getItem('taa_props') || '[]');
+  const n = String(props.length + 1).padStart(4,'0');
+  document.getElementById('propId').textContent = `TAA-${new Date().getFullYear()}-${n}`;
+}
+
+function buildChecklist() {
+  const c = document.getElementById('chkList');
+  CHECKLIST.forEach(item => {
+    checks[item.id] = false;
+    const d = document.createElement('div');
+    d.className = 'chk-item'; d.id = `ci_${item.id}`;
+    d.onclick = () => toggleChk(item.id);
+    d.innerHTML = `
+      <div class="chk-box" id="cb_${item.id}"></div>
+      <div class="chk-info">
+        <div class="chk-name">${item.name}</div>
+        <div class="chk-hint">${item.hint}</div>
+      </div>
+      <div class="chk-tag">${item.tag}</div>`;
+    c.appendChild(d);
+  });
+}
+
+function autoGPS() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      ['q_lat','q_lng','f_lat','f_lng'].forEach((id,i) => {
+        const el = document.getElementById(id);
+        if (el) el.value = i%2===0 ? lat : lng;
+      });
+    }, () => {});
+  }
+}
+
+// ── MARKETS ──
+function updateMarkets(targetId, zone) {
+  const sel = document.getElementById(targetId);
+  sel.innerHTML = '<option value="">Select Market</option>';
+  (MARKETS[zone] || []).forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m; sel.appendChild(o);
+  });
+}
+
+// ── GPS ──
+function getGPS(latId, lngId, btnId) {
+  const btn = document.getElementById(btnId);
+  btn.classList.add('loading'); btn.textContent = '...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById(latId).value = pos.coords.latitude.toFixed(6);
+      document.getElementById(lngId).value = pos.coords.longitude.toFixed(6);
+      btn.classList.remove('loading'); btn.innerHTML = '📍 GPS';
+      showBanner('📍 Location captured', 'ok');
+    },
+    () => { btn.classList.remove('loading'); btn.innerHTML = '📍 GPS'; showBanner('Location unavailable', 'err'); }
+  );
+}
+
+// ── CHECKLIST ──
+function toggleChk(id) {
+  checks[id] = !checks[id];
+  const item = document.getElementById(`ci_${id}`);
+  const box  = document.getElementById(`cb_${id}`);
+  item.classList.toggle('on', checks[id]);
+  box.textContent = checks[id] ? '✓' : '';
+  updateScore();
+}
+function updateScore() {
+  const met = Object.values(checks).filter(Boolean).length;
+  const pct = Math.round(met/10*100);
+  document.getElementById('scoreNum').textContent = `${met}/10`;
+  document.getElementById('scorePct').textContent = `${pct}%`;
+  const bar = document.getElementById('scoreBar');
+  bar.style.width = pct+'%';
+  bar.style.background = pct>=70 ? 'var(--green)' : pct>=50 ? '#f39c12' : 'var(--red)';
+  document.getElementById('scoreNum').className = `score-num ${pct>=70?'score-pass':'score-fail'}`;
+  const v = document.getElementById('scoreVerdict');
+  if (pct>=70) { v.textContent='✅ Qualifies — Proceed'; v.className='score-verdict verd-pass'; }
+  else { v.textContent=`❌ ${pct}% — Need 70% Min`; v.className='score-verdict verd-fail'; }
+}
+
+// ── MODE ──
+function setMode(m) {
+  curMode = m;
+  document.getElementById('modeQuick').classList.toggle('active', m==='quick');
+  document.getElementById('modeFull').classList.toggle('active', m==='full');
+  document.getElementById('quickMode').style.display = m==='quick' ? 'block' : 'none';
+  document.getElementById('fullMode').style.display = m==='full' ? 'block' : 'none';
+  document.getElementById('secTabs').style.display = m==='full' ? 'flex' : 'none';
+  updateNav();
+}
+
+function updateNav() {
+  const nav = document.getElementById('navBar');
+  nav.style.display = curMode==='full' ? 'flex' : 'none';
+}
+
+// ── SECTION NAV ──
+function goSec(idx) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`s${idx}`).classList.add('active');
+  document.querySelectorAll('.s-tab')[idx].classList.add('active');
+  curSec = idx;
+  document.getElementById('btnBack').disabled = idx===0;
+  const nxt = document.getElementById('btnNext');
+  if (idx===TOTAL_SECS-1) {
+    nxt.textContent = '💾 Save'; nxt.className = 'btn btn-save'; nxt.onclick = openModal;
+  } else {
+    nxt.textContent = 'Next →'; nxt.className = 'btn btn-next'; nxt.onclick = () => navigate(1);
+  }
+  document.getElementById('progFill').style.width = ((idx+1)/TOTAL_SECS*100)+'%';
+  document.querySelectorAll('.s-tab')[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function navigate(d) { const n=curSec+d; if(n>=0&&n<TOTAL_SECS) goSec(n); }
+
+// ── COLLECT DATA ──
+function collectFull() {
+  const score = Object.values(checks).filter(Boolean).length;
+  return {
+    property_id: document.getElementById('propId').textContent,
+    zone: v('f_zone'), market: v('f_market'), key_road: v('f_road'),
+    full_address: v('f_address'), developer: v('f_developer'),
+    pin_code: v('f_pin'), maps_link: v('f_maps'),
+    lat: v('f_lat'), lng: v('f_lng'),
+    sbu_area: v('f_sbu'), carpet_area: v('f_carpet'),
+    property_age: v('f_age'), num_floors: v('f_floors'),
+    avail_floors: v('f_availFloors'), property_type: v('f_propType'),
+    road_width: v('f_roadW'), bldg_width: v('f_bldgW'),
+    facade: v('f_facade'), slab_height: v('f_slab'),
+    column_spacing: v('f_cols'), storefront_parking: v('f_park'),
+    basement: v('f_base'), elevator: v('f_lift'),
+    access_type: v('f_access'), power_load: v('f_power'),
+    power_backup: v('f_backup'), glass_glazing: v('f_glass'),
+    staircase: v('f_stairs'), flooring: v('f_floor'),
+    compliance: v('f_comply'), cad_available: v('f_cad'),
+    rent: v('f_rent'), maintenance: v('f_maint'),
+    security_deposit: v('f_deposit'), lock_in: v('f_lockin'),
+    lease_term: v('f_lease'),
+    owner_name: v('f_ownerName'), owner_phone: v('f_ownerPhone'),
+    owner_constraints: v('f_ownerNotes'),
+    status: v('f_status') || 'Available',
+    sourced_date: v('f_sourcedDate'), matched_brand: v('f_brand'),
+    photos_link: v('f_photos'), pref_brand_category: v('f_brandCat'),
+    last_followup: v('f_followup'), notes: v('f_notes'),
+    onfield_score: `${score}/10 (${Math.round(score/10*100)}%)`,
+    surveyor_name: getSurveyorLabel(),
+    source: 'Web Form'
+  };
+}
+
+function collectQuick() {
+  return {
+    zone: v('q_zone'), market: v('q_market'),
+    key_road: v('q_road'), lat: v('q_lat'), lng: v('q_lng'),
+    carpet_area: v('q_carpet'), rent: v('q_rent'),
+    security_deposit: v('q_deposit'),
+    owner_name: v('q_ownerName'), owner_phone: v('q_ownerPhone'),
+    notes: v('q_notes'), status: 'Available',
+    sourced_date: new Date().toISOString().split('T')[0],
+    surveyor_name: getSurveyorLabel(),
+    source: 'Quick Capture'
+  };
+}
+
+function v(id) { const e=document.getElementById(id); return e ? e.value.trim() : ''; }
+
+// ── QUICK SAVE ──
+async function saveQuick() {
+  if (!surveyorData.email) { showBanner('⚠️ Sign in first to record surveyor name', 'err'); document.getElementById('surveyorRequired').style.display='inline'; }
+  const data = collectQuick();
+  if (!data.owner_phone && !data.owner_name) { showBanner('Enter at least owner name or contact', 'err'); return; }
+  await pushToSheets(data);
+  downloadRowCSV(data);
+  showBanner('✅ Saved to Sheets + CSV backup downloaded', 'ok');
+}
+
+// ── SHEETS ──
+async function pushToSheets(data) {
+  const url = localStorage.getItem('taa_sheet_url');
+  if (!url) return false;
+  setSyncState('syncing', 'Saving...');
+  try {
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    setSyncState('connected', 'Saved ✓');
+    return true;
+  } catch(e) {
+    setSyncState('error', 'Sync failed');
+    return false;
+  }
+}
+
+async function saveToSheets() {
+  const data = curMode==='full' ? collectFull() : collectQuick();
+  const ok = await pushToSheets(data);
+  if (ok) { closeModal(); showBanner('✅ Saved to Google Sheets', 'ok'); }
+  else showBanner('Sheets not connected — use copy/download', 'err');
+}
+
+function copyRow() {
+  const data = curMode==='full' ? collectFull() : collectQuick();
+  const vals = Object.values(data).join('\t');
+  navigator.clipboard.writeText(vals).then(() => { closeModal(); showBanner('📋 Row copied — paste into Excel', 'ok'); });
+}
+
+function downloadCSV() {
+  const data = curMode==='full' ? collectFull() : collectQuick();
+  downloadRowCSV(data);
+  closeModal();
+}
+
+function downloadRowCSV(data) {
+  const keys = Object.keys(data), vals = Object.values(data);
+  const csv = [keys.join(','), vals.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `${data.property_id || 'property'}_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+// ── SETTINGS / CONNECT ──
+function toggleSettings() {
+  const p = document.getElementById('settingsPanel');
+  p.style.display = p.style.display==='none' ? 'block' : 'none';
+}
+
+function loadSettings() {
+  const url = localStorage.getItem('taa_sheet_url');
+  if (url) {
+    document.getElementById('sheetUrl').value = url;
+    pingSheet(url);
+  }
+}
+
+async function connectSheet() {
+  const url = document.getElementById('sheetUrl').value.trim();
+  if (!url.includes('script.google.com')) { showBanner('Invalid URL — must be a Google Apps Script URL', 'err'); return; }
+  setSyncState('syncing', 'Testing...');
+  const ok = await pingSheet(url);
+  if (ok) { localStorage.setItem('taa_sheet_url', url); showBanner('✅ Connected to Google Sheets!', 'ok'); }
+  else showBanner('Could not connect — check URL and deployment settings', 'err');
+}
+
+async function pingSheet(url) {
+  try {
+    const r = await fetch(url + '?action=ping');
+    const d = await r.json();
+    if (d.status === 'ok') { setSyncState('connected', 'Connected'); return true; }
+  } catch(e) {}
+  setSyncState('error', 'Not connected');
+  return false;
+}
+
+function setSyncState(state, label) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
+}
+
+// ── MODAL ──
+function openModal() {
+  const url = localStorage.getItem('taa_sheet_url');
+  document.getElementById('sheetStatus').textContent = url ? '✅ Google Sheets connected — will save automatically' : '⚠️ Google Sheets not connected — use copy/download backup';
+  document.getElementById('exportModal').classList.add('open');
+}
+function closeModal() { document.getElementById('exportModal').classList.remove('open'); }
+window.onclick = e => { if (e.target.id==='exportModal') closeModal(); };
+
+// ── SURVEYOR / GOOGLE SIGN-IN ──
+let surveyorData = { name: '', email: '', picture: '' };
+
+function onGoogleSignIn(response) {
+  // Decode JWT
+  const payload = JSON.parse(atob(response.credential.split('.')[1]));
+  surveyorData = {
+    name: payload.name || '',
+    email: payload.email || '',
+    picture: payload.picture || ''
+  };
+  updateSurveyorUI();
+  localStorage.setItem('taa_surveyor', JSON.stringify(surveyorData));
+  showBanner('✅ Signed in as ' + surveyorData.name, 'ok');
+}
+
+function updateSurveyorUI() {
+  document.getElementById('surveyorNameDisplay').textContent = surveyorData.name || 'Not signed in';
+  document.getElementById('surveyorEmailDisplay').textContent = surveyorData.email || 'Sign in to record your name on submissions';
+  const avatar = document.getElementById('surveyorAvatar');
+  if (surveyorData.picture) {
+    avatar.innerHTML = `<img src="${surveyorData.picture}" alt="profile">`;
+  }
+  // Hide sign-in button once signed in
+  if (surveyorData.email) {
+    document.getElementById('signInBtnWrap').innerHTML =
+      `<button class="btn-signin" onclick="signOut()" style="font-size:10px;padding:5px 10px;">Sign Out</button>`;
+  }
+}
+
+function signOut() {
+  surveyorData = { name: '', email: '', picture: '' };
+  localStorage.removeItem('taa_surveyor');
+  updateSurveyorUI();
+  document.getElementById('signInBtnWrap').innerHTML = `
+    <div class="g_id_signin"
+      data-type="standard" data-size="small" data-theme="outline"
+      data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+    </div>`;
+  if (window.google) google.accounts.id.renderButton(
+    document.querySelector('.g_id_signin'), {theme:'outline', size:'small'}
+  );
+}
+
+function loadSurveyor() {
+  const saved = localStorage.getItem('taa_surveyor');
+  if (saved) {
+    try {
+      surveyorData = JSON.parse(saved);
+      updateSurveyorUI();
+    } catch(e) {}
+  }
+}
+
+function getSurveyorLabel() {
+  if (surveyorData.name && surveyorData.email) {
+    return `${surveyorData.name} (${surveyorData.email})`;
+  }
+  return surveyorData.name || surveyorData.email || 'Unknown';
+}
+
+
+// ── BANNER ──
+function showBanner(msg, type) {
+  const b = document.getElementById('banner');
+  b.textContent = msg;
+  b.className = `status-banner show banner-${type==='ok'?'ok':type==='err'?'err':'info'}`;
+  setTimeout(() => b.className = 'status-banner', 3000);
+}
+</script>
+</body>
+</html>
